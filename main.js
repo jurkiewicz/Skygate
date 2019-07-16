@@ -84,7 +84,6 @@ const ul = document.getElementById('cities');
 const myCountry = document.getElementById('country');
 
 function search(val) {
-
   myCountry.innerHTML = val;
 
   while (ul.firstChild) {
@@ -111,11 +110,14 @@ function search(val) {
       let cities = data.results;
       return cities.forEach(city => {
         let li = createNode('li'),
-          span = createNode('span');
-        li.addEventListener("click", e => {
+          span = createNode('span'),
+          button = createNode('button');
+        li.addEventListener("click", function create(e) {
           description(li);
+          li.removeEventListener("click", create);
         });
-        span.innerHTML = `${city.city}`;
+        span.innerHTML = `${city.city.replace(/\uFFFD/g,"?")}`;
+        append(li, button);
         append(li, span);
         append(ul, li);
       })
@@ -125,31 +127,56 @@ function search(val) {
     });
 }
 
+function hide(el) {
+  el.style.color = "black";
+  el.getElementsByClassName("description")[0].style.display = "none";
+  el.removeEventListener("click", close);
+
+  el.addEventListener("click", function open(e) {
+    show(el);
+  });
+}
+
+function show(el) {
+  el.style.color = "navy";
+  el.getElementsByClassName("description")[0].style.display = "block";
+}
+
 function description(el) {
-  // let div = createNode('div');
-  // div.innerHTML = `${city.city}`;
-  // append(el, div);
+
   el.style.color = "navy";
 
-  var wikiUrl = "https://www.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles=" + el.firstChild.innerHTML;
+  var city = el.getElementsByTagName("span")[0].innerHTML;
 
-  fetch(wikiUrl, {
-      method: 'get',
-      headers: {
-            'Content-Type': 'application/json',
-            'Origin': '*'
-      },
-    })
-    .then(response => {
-      return response.json();
-    })
-    .then(data => {
-      var dscr = data;
-      console.log(data);
-    })
-    .catch(error => {
-      console.log('Request failed', error);
-    });
+  var wikiUrl = "https://en.wikipedia.org/w/api.php?origin=*&format=json&action=query&prop=extracts&exintro&redirects=1&titles=" + city;
+
+  fetch(wikiUrl).then(function(resp) {
+    return resp.json()
+  }).then(function(data) {
+    var index = Object.keys(data.query.pages);
+    var text = data.query.pages[index].extract;
+    var dsr = "";
+    if (text != null) {
+      var sentence = text.split(".");
+      for (var i = 0; i < sentence.length; i++) {
+        dsr = dsr.concat(sentence[i] + ". ");
+        if (dsr.length > 500) {
+          break;
+        }
+      }
+
+    } else {
+      dsr = "We can't find any informations about this city now."
+    }
+    var div = createNode("div");
+    div.className = "description";
+    div.innerHTML = dsr;
+    append(el, div);
+  });
+
+  el.addEventListener("click", function close(e) {
+    hide(el);
+  });
 }
 
 function createNode(element) {
@@ -158,6 +185,17 @@ function createNode(element) {
 
 function append(parent, el) {
   return parent.appendChild(el);
+}
+
+window.onbeforeunload = function() {
+  localStorage.setItem("country", myCountry.innerHTML);
+}
+
+window.onload = function() {
+  var country = localStorage.getItem("country");
+  if (country !== null) {
+    search(country);
+  }
 }
 
 autocomplete(document.getElementById("myInput"), countries);
