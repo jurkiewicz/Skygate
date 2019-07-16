@@ -95,13 +95,12 @@ function search(val) {
 
   var result = fetch(codeUrl, {
       method: 'get',
-    }).then(response => {
+    })
+    .then(response => {
       return response.json();
-    }).then(data => {
-      var code;
-      data.forEach(country => {
-        code = country.alpha2Code;
-      });
+    })
+    .then(data => {
+      var code = data[0].alpha2Code;
 
       return fetch("https://api.openaq.org/v1/cities/?limit=10&sort=desc&order_by=count&country=" + code);
     })
@@ -109,26 +108,56 @@ function search(val) {
       return response.json();
     })
     .then(data => {
-      let cities = data.results; // Get the results
-      return cities.forEach(city => { // Map through the results and for each run the code below
-        let li = createNode('li'), //  Create the elements we need
+      let cities = data.results;
+      return cities.forEach(city => {
+        let li = createNode('li'),
           span = createNode('span');
-        span.innerHTML = `${city.city}`; // Make the HTML of our span to be the first and last name of our author
+        li.addEventListener("click", e => {
+          description(li);
+        });
+        span.innerHTML = `${city.city}`;
         append(li, span);
         append(ul, li);
       })
     })
     .catch(error => {
-      console.log('Request failed', error)
+      console.log('Request failed', error);
+    });
+}
+
+function description(el) {
+  // let div = createNode('div');
+  // div.innerHTML = `${city.city}`;
+  // append(el, div);
+  el.style.color = "navy";
+
+  var wikiUrl = "https://www.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles=" + el.firstChild.innerHTML;
+
+  fetch(wikiUrl, {
+      method: 'get',
+      headers: {
+            'Content-Type': 'application/json',
+            'Origin': '*'
+      },
+    })
+    .then(response => {
+      return response.json();
+    })
+    .then(data => {
+      var dscr = data;
+      console.log(data);
+    })
+    .catch(error => {
+      console.log('Request failed', error);
     });
 }
 
 function createNode(element) {
-  return document.createElement(element); // Create the type of element you pass in the parameters
+  return document.createElement(element);
 }
 
 function append(parent, el) {
-  return parent.appendChild(el); // Append the second parameter(element) to the first one
+  return parent.appendChild(el);
 }
 
 autocomplete(document.getElementById("myInput"), countries);
