@@ -6,23 +6,41 @@
   <title>Skygate</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="main.css">
-
+  <script type="text/javascript" src="main.js"></script>
 </head>
 
 <body>
 
+  <header>
+    <h1>Fresh air for you</h1>
+  </header>
+
   <form autocomplete="off">
-    <div class="autocomplete" style="width:300px;">
-      <input id="myInput" type="text" name="myCountry" placeholder="Country">
+    <p>Find your country:</p>
+    <div>
+      <div class="autocomplete">
+        <input id="myInput" type="text" name="myCountry" placeholder="Country">
+      </div>
+      <button type="button" name="button" id="mySubmit">search</button>
     </div>
-    <button type="button" name="button" id="mySubmit">Search</button>
   </form>
 
   <h3>The most polluted cities in </h3>
-  <h1 id="country"></h1>
-  <ul id="cities"></ul>
+  <h2 id="country"></h2>
+  <div class="results">
+    <ul id="cities"></ul>
+    <div class="container">
+      <div class="close">
+        <div id="cone">
 
-  <script type="text/javascript" src="main.js"></script>
+        </div>
+      </div>
+      <div id="description" class="description"></div>
+    </div>
+  </div>
+
+
+
 
 </body>
 
