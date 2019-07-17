@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-  var countries = ["Poland", "Germany", "Spain", "France", "Pakistan"];
+  var countries = ["Poland", "Germany", "Spain", "France"];
 
   const ul = document.getElementById('cities');
   const myCountry = document.getElementById('country');
@@ -196,11 +196,10 @@ document.addEventListener('DOMContentLoaded', () => {
   submit(document.getElementById("mySubmit"), document.getElementById("myInput"));
 
   function close(){
-    var div = document.getElementById("description");
-    div.innerHTML = "";
-    div.style.padding = "0";
     var container = document.getElementsByClassName("container")[0];
     container.style.transform= "scaleY(0)";
+    var div = document.getElementById("description");
+    div.style.padding = "0";
   }
 
   document.getElementsByClassName("close")[0].addEventListener("click", e => {
